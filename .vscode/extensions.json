@@ -1,4 +1,27 @@
 {
-  "recommendations": ["astro-build.astro-vscode"],
+  "recommendations": [
+    "astro-build.astro-vscode",
+    "christian-kohler.npm-intellisense",
+    "DavidAnson.vscode-markdownlint",
+    "donjayamanne.githistory",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "formulahendry.auto-rename-tag",
+    "github.codespaces",
+    "github.copilot-chat",
+    "github.remotehub",
+    "github.vscode-github-actions",
+    "github.vscode-pull-request-github",
+    "james-yu.latex-workshop",
+    "maltehei.latex-acronyms",
+    "maltehei.latex-citations",
+    "mhutchie.git-graph",
+    "ms-vscode-remote.remote-containers",
+    "ms-vscode.live-server",
+    "unifiedjs.vscode-mdx",
+    "usernamehw.errorlens",
+    "vector-of-bool.gitflow",
+    "yzhang.markdown-all-in-one"
+  ],
   "unwantedRecommendations": []
 }
