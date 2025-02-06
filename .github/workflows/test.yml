@@ -1,0 +1,110 @@
+name: Tests
+
+on:
+  push:
+    # branches:
+    #   - $default-branch
+  workflow_dispatch:
+
+jobs:
+
+  lighthouseci:
+    # https://github.com/GoogleChrome/lighthouse-ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        # with:
+        #   node-version: 18
+      # - name: Install Chrome
+      #   run: |
+      #     # sudo apt-get update
+      #     # sudo apt-get install libxss1 libappindicator1 libindicator7
+      #     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+      #     sudo dpkg -i google-chrome-stable_current_amd64.deb
+      #     # sudo apt -f install
+      #
+      #     # mkdir /etc/apt/keyrings
+      #     # # wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo tee /etc/apt/keyrings/google.asc >/dev/null
+      #     # wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - 
+      #     # sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google.asc] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+      #     # sudo apt-get update
+      #     # sudo apt-get install google-chrome-stable
+      #     # # wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - 
+      #     # # sudo sh -c 'echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+      #     # # sudo apt-get update
+      #     # # sudo apt-get install google-chrome-stable
+      #     #
+      #     # sudo apt --fix-broken install
+      - name: lighthouse config
+        run: |
+            cat <<-'EOF' > lighthouserc.json
+            {
+              "ci": {
+                "collect": {
+                  "numberOfRuns": 3,
+                  "staticDistDir": "./dist",
+                  "# url": [
+                    "https://astro-micro.vercel.app/"
+                  ],
+                  "settings": {
+                    "# preset": "desktop"
+                  }
+                },
+                "upload": {
+                  "target": "temporary-public-storage"
+                }
+              }
+            }
+            EOF
+      - run: npm install
+      - run: npm install -g @lhci/cli@0.14.x
+      - run: npm run build
+      # - run: lhci autorun --collect.staticDistDir=./dist --collect.numberOfRuns=3 --upload.target=temporary-public-storage --collect.settings.preset=desktop
+      - run: |
+          lhci autorun --collect.settings.preset=desktop
+          lhci autorun      # Run collect/assert/upload with sensible defaults
+          # lhci collect      # Run Lighthouse and save the results to a local folder
+          # lhci assert       # Assert that the latest results meet expectations
+          # lhci upload       # Save the results to the server
+        env:
+          # https://github.com/apps/lighthouse-ci
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  # lighthouse-ci:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: lightouse config
+  #       run: |
+  #         cat <<-'EOF' > lighthouserc.json
+  #         {
+  #           "ci": {
+  #             "collect": {
+  #               "staticDistDir": "./dist"
+  #             }
+  #           }
+  #         }
+  #         EOF
+  #     - name: npm install & build
+  #       run: |
+  #         npm install
+  #         npm run build
+  #     - name: Audit URLs using Lighthouse
+  #       uses: treosh/lighthouse-ci-action@v12
+  #       with:
+  #         configPath: './lighthouserc.json'
+  #         temporaryPublicStorage: true # upload lighthouse report to the temporary storage
+  #         runs: 3
+
+  # lighthouse-check:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Lighthouse
+  #       uses: foo-software/lighthouse-check-action@master
+  #       with:
+  #         urls: 'https://www.foo.software,https://www.google.com'
+  #         configFile: './lighthouserc.json'
+  #         device: 'all'
+
